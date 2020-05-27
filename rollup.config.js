@@ -3,15 +3,20 @@ import esbuildPlugin from 'rollup-plugin-esbuild'
 import nodeResolvePlugin from '@rollup/plugin-node-resolve'
 import commonjsPlugin from '@rollup/plugin-commonjs'
 
-const createConfig = ({ minify, format, dts } = {}) => {
-  const filename = `[name]${format === 'esm' ? '.esm' : ''}${
-    minify ? '.min' : ''
-  }.js`
+const createConfig = ({ minify, format, dts, forBrowser } = {}) => {
+  let f = ''
+  if (format === 'iife') {
+    f = '.browser'
+  }
+  if (format === 'es') {
+    f = '.browser.esm'
+  }
+  const filename = `[name]${f}${minify ? '.min' : ''}.js`
   return {
     input: 'src/index.ts',
     output: {
       format,
-      name: 'index',
+      name: 'trackerManager',
       dir: 'dist',
       entryFileNames: dts ? '[name].d.ts' : filename,
     },
@@ -19,6 +24,7 @@ const createConfig = ({ minify, format, dts } = {}) => {
       commonjsPlugin({}),
       nodeResolvePlugin({
         extensions: dts ? ['.d.ts', '.ts'] : ['.js', '.ts', '.json', '.mjs'],
+        browser: !!forBrowser,
       }),
       !dts &&
         esbuildPlugin({
@@ -32,10 +38,12 @@ const createConfig = ({ minify, format, dts } = {}) => {
 export default [
   // Generate types
   createConfig({ dts: true }),
+  // cjs
+  createConfig({ format: 'cjs' }),
   // UMD format
-  createConfig({ format: 'umd' }),
+  createConfig({ format: 'iife', forBrowser: true }),
   // Minified UMD format
-  createConfig({ format: 'umd', minify: true }),
-  // ESM format
-  createConfig({ format: 'esm' }),
+  createConfig({ format: 'iife', minify: true, forBrowser: true }),
+  // ES format
+  createConfig({ format: 'es', minify: true, forBrowser: true }),
 ]

@@ -4,13 +4,12 @@
   "description": "my cool project",
   "main": "./dist/index.js",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
-  "unpkg": "dist/index.min.js",
-  "cdn": "dist/index.min.js",
-  "jsdelivr": "dist/index.min.js",
-  "module": "dist/index.esm.js",
+  "unpkg": "dist/index.browser.min.js",
+  "cdn": "dist/index.browser.min.js",
+  "jsdelivr": "dist/index.browser.min.js",
+  "module": "dist/index.browser.esm.min.js",
   "publishConfig": {
     "access": "public"
   },
@@ -74,6 +73,6 @@
     }
   },
   "dependencies": {
-    "browser-process-hrtime": "^1.0.0"
+    "@zcong/hrtime": "^0.1.1"
   }
 }

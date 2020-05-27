@@ -1,4 +1,4 @@
-import hrtime from 'browser-process-hrtime'
+import { hrtime } from '@zcong/hrtime'
 
 function randomId(): string {
   return Math.random().toString(36).substring(2, 15)
