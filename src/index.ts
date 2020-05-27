@@ -1,5 +1,8 @@
 import hrtime from 'browser-process-hrtime'
-import * as uuid from 'uuid'
+
+function randomId(): string {
+  return Math.random().toString(36).substring(2, 15)
+}
 
 function hrtime2nano(hrtime: [number, number]): number {
   return hrtime[0] * 1e9 + hrtime[1]
@@ -166,7 +169,7 @@ export interface IDurationTracker extends IViewClickTracker {
 export const createViewTracker = (opt: IViewClickTracker) => {
   const vt = new ViewTracker()
   if (!opt.eventId) {
-    opt.eventId = uuid.v4()
+    opt.eventId = randomId()
   }
   vt.eventId = opt.eventId
   vt.eventName = opt.eventName
@@ -181,7 +184,7 @@ export const createViewTracker = (opt: IViewClickTracker) => {
 export const createClickTracker = (opt: IViewClickTracker) => {
   const vt = new ClickTracker()
   if (!opt.eventId) {
-    opt.eventId = uuid.v4()
+    opt.eventId = randomId()
   }
   vt.eventId = opt.eventId
   vt.eventName = opt.eventName
