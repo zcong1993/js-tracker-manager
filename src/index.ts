@@ -107,8 +107,17 @@ export class TrackerManager {
       tracker.screenName = this.currScreen
     }
 
+    tracker.appendExt(this.commonData)
     tracker.appendExt({ prevScreen: this.prevScreen })
     this.unEndDurationTrackerMap.set(tracker.eventId, tracker)
+  }
+
+  endDurationTracker(eventId: string) {
+    const endEvent = new DurationTracker()
+    endEvent.eventId = eventId
+    endEvent.type = 'end'
+
+    this.addDurationTracker(endEvent)
   }
 
   getTrackers() {
@@ -234,12 +243,15 @@ export const createDurationTracker = (opt: IDurationTracker) => {
 //   tm.addDurationTracker(d1)
 
 //   setTimeout(() => {
-//     const d2 = createDurationTracker({
-//       type: 'end',
-//       eventId: 'video-1',
-//       eventName: 'playVideo',
-//     })
-//     tm.addDurationTracker(d2)
+//     // const d2 = createDurationTracker({
+//     //   type: 'end',
+//     //   eventId: 'video-1',
+//     //   eventName: 'playVideo',
+//     // })
+
+//     // tm.addDurationTracker(d2)
+//     tm.endDurationTracker('video-1')
+//     tm.endDurationTracker('video-2')
 //   }, 5000)
 
 //   const ct = createClickTracker({
