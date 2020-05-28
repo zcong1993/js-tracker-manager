@@ -13,7 +13,7 @@ function nowHrtime() {
 }
 
 function nano2s(d: number) {
-  return (d / 1e9).toFixed(2)
+  return parseFloat((d / 1e9).toFixed(2))
 }
 
 type DurationType = 'start' | 'end'

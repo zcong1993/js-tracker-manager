@@ -170,7 +170,7 @@ it('duration tracker should work well', async () => {
   expectDurationArray(toData(tm.getTrackers()), [
     {
       eventName: 'playVideo',
-      ext: { userId: 'xx', duration: '1.00' },
+      ext: { userId: 'xx', duration: 1 },
       screenName: 'video',
     },
   ])
@@ -197,7 +197,7 @@ it('split duration tracker should work well', async () => {
   expectDurationArray(toData(tm.getTrackers()), [
     {
       eventName: 'playVideo',
-      ext: { userId: 'xx', duration: '1.00' },
+      ext: { userId: 'xx', duration: 1 },
       screenName: 'video',
     },
   ])
@@ -215,7 +215,7 @@ it('split duration tracker should work well', async () => {
   expectDurationArray(toData(tm.getTrackers()), [
     {
       eventName: 'playVideo',
-      ext: { userId: 'xx', duration: '1.00' },
+      ext: { userId: 'xx', duration: 1 },
       screenName: 'video',
     },
   ])
