@@ -27,8 +27,8 @@ const main = async () => {
 
   setInterval(() => {
     console.log(JSON.stringify(tm.getTrackers()))
-    console.log((tm as any).unEndDurationTrackerMap.size)
-    console.log((tm as any).trackersMap.size)
+    console.log('unend map size: ', tm.unEndDurationTrackerSize)
+    console.log('tracker size: ', tm.trackerSize)
   }, 3000)
 
   const vt1 = createViewTracker({
