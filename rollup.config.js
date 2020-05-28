@@ -5,7 +5,7 @@ import commonjsPlugin from '@rollup/plugin-commonjs'
 
 const createConfig = ({ minify, format, dts, forBrowser } = {}) => {
   let f = ''
-  if (format === 'iife') {
+  if (format === 'umd') {
     f = '.browser'
   }
   if (format === 'es') {
@@ -41,9 +41,9 @@ export default [
   // cjs
   createConfig({ format: 'cjs' }),
   // UMD format
-  createConfig({ format: 'iife', forBrowser: true }),
+  createConfig({ format: 'umd', forBrowser: true }),
   // Minified UMD format
-  createConfig({ format: 'iife', minify: true, forBrowser: true }),
+  createConfig({ format: 'umd', minify: true, forBrowser: true }),
   // ES format
   createConfig({ format: 'es', minify: true, forBrowser: true }),
 ]
