@@ -130,6 +130,22 @@ export class TrackerManager {
     return res
   }
 
+  setPrevScreen(prevScreen: string) {
+    this.prevScreen = prevScreen
+  }
+
+  setCurrentScreen(currScreen: string) {
+    this.currScreen = currScreen
+  }
+
+  get trackerSize() {
+    return this.trackersMap.size
+  }
+
+  get unEndDurationTrackerSize() {
+    return this.unEndDurationTrackerMap.size
+  }
+
   private refreshDurationTracker(tracker: DurationTracker) {
     if (tracker.type !== 'start') {
       throw new Error('only start duration tracker can be refresh')
