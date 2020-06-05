@@ -24,6 +24,7 @@ class Tracker {
   eventName: string
   ext: ExtType = {}
   screenName?: string
+  time?: Date
 
   appendExt(added: ExtType) {
     this.ext = {
@@ -38,6 +39,7 @@ class Tracker {
       eventName: this.eventName,
       ext: this.ext,
       screenName: this.screenName,
+      time: this.time,
     }
 
     return obj
@@ -48,8 +50,10 @@ class ClickTracker extends Tracker {}
 class ViewTracker extends Tracker {}
 
 class DurationTracker extends Tracker {
-  time?: number
+  t?: number
   type: DurationType
+  duration: number
+  endTime?: Date
 
   clone() {
     const t = new DurationTracker()
@@ -57,9 +61,20 @@ class DurationTracker extends Tracker {
     t.eventName = this.eventName
     t.ext = this.ext
     t.screenName = this.screenName
-    t.time = this.time
+    t.t = this.t
+    t.duration = this.duration
     t.type = this.type
     return t
+  }
+
+  toJSON() {
+    const obj = {
+      ...super.toJSON(),
+      duration: this.duration,
+      endTime: this.endTime,
+    }
+
+    return obj
   }
 }
 
@@ -79,8 +94,8 @@ export class TrackerManager {
   }
 
   addDurationTracker(tracker: DurationTracker): void {
-    if (!tracker.time) {
-      tracker.time = nowHrtime()
+    if (!tracker.t) {
+      tracker.t = nowHrtime()
     }
     // for end
     if (tracker.type === 'end') {
@@ -91,8 +106,10 @@ export class TrackerManager {
       }
 
       const startEvent = this.unEndDurationTrackerMap.get(tracker.eventId)
-      const duration = nano2s(tracker.time - startEvent.time)
+      const duration = nano2s(tracker.t - startEvent.t)
       startEvent.appendExt({ duration })
+      startEvent.duration = duration
+      startEvent.endTime = new Date()
       this.trackersMap.set(tracker.eventId, startEvent)
       this.unEndDurationTrackerMap.delete(tracker.eventId)
       return
@@ -153,11 +170,12 @@ export class TrackerManager {
 
     const t = tracker.clone()
     const now = nowHrtime()
-    const duration = nano2s(now - tracker.time)
+    const duration = nano2s(now - tracker.t)
     t.appendExt({ duration })
+    t.duration = duration
 
     // reset start tracker
-    tracker.time = now
+    tracker.t = now
 
     return t
   }
@@ -183,10 +201,11 @@ export interface IViewClickTracker {
   eventId?: string
   ext?: ExtType
   screenName?: string
+  time?: Date
 }
 
 export interface IDurationTracker extends IViewClickTracker {
-  time?: number
+  t?: number
   type: DurationType
   eventId: string
 }
@@ -203,6 +222,8 @@ export const createViewTracker = (opt: IViewClickTracker) => {
     vt.ext = opt.ext
   }
 
+  vt.time = new Date()
+
   return vt
 }
 
@@ -218,6 +239,8 @@ export const createClickTracker = (opt: IViewClickTracker) => {
     vt.ext = opt.ext
   }
 
+  vt.time = new Date()
+
   return vt
 }
 
@@ -231,6 +254,7 @@ export const createDurationTracker = (opt: IDurationTracker) => {
   }
 
   vt.type = opt.type
-  vt.time = opt.time
+  vt.t = opt.t
+  vt.time = new Date()
   return vt
 }

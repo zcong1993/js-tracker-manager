@@ -9,6 +9,15 @@ const toData = (obj: any) => {
   return JSON.parse(JSON.stringify(obj))
 }
 
+const omit = (arr: any[], ...keys: string[]) => {
+  return arr.map((it) => {
+    keys.forEach((k) => {
+      delete it[k]
+    })
+    return it
+  })
+}
+
 const expectDuration = (act: any, exp: any, deviation: number = 0.01) => {
   expect(act.ext.duration).toBeDefined()
   expect(exp.ext.duration).toBeDefined()
@@ -16,6 +25,8 @@ const expectDuration = (act: any, exp: any, deviation: number = 0.01) => {
   expect(dev).toBeLessThan(deviation)
   delete act.ext.duration
   delete exp.ext.duration
+  delete act.duration
+  delete exp.duration
   expect(act).toEqual(exp)
 }
 
@@ -43,7 +54,7 @@ it('view tracker should work well', () => {
 
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(toData(tm.getTrackers())).toEqual([
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     { eventName: 'view', ext: { userId: 'xx' }, screenName: 'presale' },
   ])
   expect(tm.trackerSize).toBe(0)
@@ -56,7 +67,7 @@ it('view tracker should work well', () => {
   }
   expect(tm.trackerSize).toBe(10)
   expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(toData(tm.getTrackers())).toEqual(
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
     Array(10).fill({
       eventName: 'view',
       ext: { userId: 'xx' },
@@ -76,7 +87,7 @@ it('view tracker should work well', () => {
   }
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(toData(tm.getTrackers())).toEqual(
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
     Array(1).fill({
       eventName: 'view',
       ext: { userId: 'xx' },
@@ -97,7 +108,7 @@ it('click tracker should work well', () => {
 
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(toData(tm.getTrackers())).toEqual([
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     { eventName: 'click', ext: { userId: 'xx' }, screenName: 'presale' },
   ])
   expect(tm.trackerSize).toBe(0)
@@ -111,7 +122,7 @@ it('click tracker should work well', () => {
   }
   expect(tm.trackerSize).toBe(10)
   expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(toData(tm.getTrackers())).toEqual(
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
     Array(10).fill({
       eventName: 'click',
       ext: { userId: 'xx' },
@@ -131,7 +142,7 @@ it('click tracker should work well', () => {
   }
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(toData(tm.getTrackers())).toEqual(
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
     Array(1).fill({
       eventName: 'click',
       ext: { userId: 'xx' },
@@ -149,7 +160,7 @@ it('duration tracker should work well', async () => {
     eventId: 'd-1',
     eventName: 'playVideo',
     // screenName: 'video',
-    time: 1209756949197785,
+    t: 1209756949197785,
   })
   tm.addDurationTracker(start)
 
@@ -160,17 +171,18 @@ it('duration tracker should work well', async () => {
     type: 'end',
     eventId: 'd-1',
     eventName: 'playVideo',
-    time: 1209757949197785,
+    t: 1209757949197785,
   })
   tm.addDurationTracker(end)
 
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
 
-  expectDurationArray(toData(tm.getTrackers()), [
+  expectDurationArray(omit(toData(tm.getTrackers()), 'time', 'endTime'), [
     {
       eventName: 'playVideo',
       ext: { userId: 'xx', duration: 1 },
+      duration: 1,
       screenName: 'video',
     },
   ])
@@ -194,10 +206,11 @@ it('split duration tracker should work well', async () => {
   expect(tm.trackerSize).toBe(0)
   expect(tm.unEndDurationTrackerSize).toBe(1)
 
-  expectDurationArray(toData(tm.getTrackers()), [
+  expectDurationArray(omit(toData(tm.getTrackers()), 'time', 'endTime'), [
     {
       eventName: 'playVideo',
       ext: { userId: 'xx', duration: 1 },
+      duration: 1,
       screenName: 'video',
     },
   ])
@@ -212,10 +225,11 @@ it('split duration tracker should work well', async () => {
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
 
-  expectDurationArray(toData(tm.getTrackers()), [
+  expectDurationArray(omit(toData(tm.getTrackers()), 'time', 'endTime'), [
     {
       eventName: 'playVideo',
       ext: { userId: 'xx', duration: 1 },
+      duration: 1,
       screenName: 'video',
     },
   ])
