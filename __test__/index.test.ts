@@ -44,7 +44,7 @@ const expectDurationArray = (
 const sleep = (n: number) => new Promise((r) => setTimeout(r, n))
 
 it('view tracker should work well', () => {
-  const tm = new TrackerManager({ userId: 'xx' })
+  const tm = new TrackerManager({ commonData: { userId: 'xx' } })
 
   const vt1 = createViewTracker({
     eventName: 'view',
@@ -98,7 +98,7 @@ it('view tracker should work well', () => {
 })
 
 it('click tracker should work well', () => {
-  const tm = new TrackerManager({ userId: 'xx' })
+  const tm = new TrackerManager({ commonData: { userId: 'xx' } })
 
   const vt1 = createClickTracker({
     eventName: 'click',
@@ -153,7 +153,7 @@ it('click tracker should work well', () => {
 })
 
 it('duration tracker should work well', async () => {
-  const tm = new TrackerManager({ userId: 'xx' })
+  const tm = new TrackerManager({ commonData: { userId: 'xx' } })
   tm.setCurrentScreen('video')
   const start = createDurationTracker({
     type: 'start',
@@ -192,7 +192,7 @@ it('duration tracker should work well', async () => {
 })
 
 it('split duration tracker should work well', async () => {
-  const tm = new TrackerManager({ userId: 'xx' })
+  const tm = new TrackerManager({ commonData: { userId: 'xx' } })
   const start = createDurationTracker({
     type: 'start',
     eventId: 'd-1',
@@ -238,4 +238,54 @@ it('split duration tracker should work well', async () => {
   expect(tm.unEndDurationTrackerSize).toBe(0)
 
   tm.endDurationTracker('d-2')
+})
+
+it('pusher should works well', async () => {
+  const mockPusher = jest.fn((x) => Promise.resolve(x))
+  const tm = new TrackerManager({
+    pusher: {
+      pushFn: mockPusher,
+      interval: 100,
+    },
+  })
+
+  for (let i = 0; i < 10; i++) {
+    const vt1 = createViewTracker({
+      eventName: 'view',
+      screenName: 'presale',
+    })
+    tm.addViewTracker(vt1)
+  }
+
+  await sleep(100)
+  expect(mockPusher).toBeCalledTimes(1)
+  expect(mockPusher.mock.calls[0][0].length).toBe(10)
+  await sleep(100)
+  expect(mockPusher).toBeCalledTimes(1)
+  tm.stop()
+
+  const mockPusher2 = jest.fn((x) => Promise.resolve(x))
+  const tm2 = new TrackerManager({
+    pusher: {
+      pushFn: mockPusher2,
+      interval: 200,
+      sizeThreshold: 3,
+    },
+  })
+
+  for (let i = 0; i < 10; i++) {
+    const vt1 = createViewTracker({
+      eventName: 'view',
+      screenName: 'presale',
+    })
+    tm2.addViewTracker(vt1)
+  }
+
+  expect(mockPusher2).toBeCalledTimes(3)
+  expect(mockPusher2.mock.calls[0][0].length).toBe(3)
+  expect(mockPusher2.mock.calls[1][0].length).toBe(3)
+  expect(mockPusher2.mock.calls[2][0].length).toBe(3)
+  await sleep(200)
+  expect(mockPusher2).toBeCalledTimes(4)
+  expect(mockPusher2.mock.calls[3][0].length).toBe(1)
 })

@@ -16,10 +16,10 @@ function nano2s(d: number) {
   return parseFloat((d / 1e9).toFixed(2))
 }
 
-type DurationType = 'start' | 'end'
-type ExtType = Record<string, any>
+export type DurationType = 'start' | 'end'
+export type ExtType = Record<string, any>
 
-class Tracker {
+export class Tracker {
   eventId: string
   eventName: string
   ext: ExtType = {}
@@ -46,10 +46,10 @@ class Tracker {
   }
 }
 
-class ClickTracker extends Tracker {}
-class ViewTracker extends Tracker {}
+export class ClickTracker extends Tracker {}
+export class ViewTracker extends Tracker {}
 
-class DurationTracker extends Tracker {
+export class DurationTracker extends Tracker {
   t?: number
   type: DurationType
   duration: number
@@ -78,12 +78,33 @@ class DurationTracker extends Tracker {
   }
 }
 
+export interface Pusher {
+  pushFn: (ts: Tracker[]) => Promise<void>
+  interval: number
+  sizeThreshold?: number
+}
+
+export interface Options {
+  commonData?: ExtType
+  pusher?: Pusher
+}
+
 export class TrackerManager {
   private prevScreen: string
   private currScreen: string
   private unEndDurationTrackerMap: Map<string, DurationTracker> = new Map()
   private trackersMap: Map<string, Tracker> = new Map()
-  constructor(private readonly commonData: ExtType) {}
+  private readonly commonData: ExtType
+  private readonly pusher: Pusher
+  private timer: ReturnType<typeof setInterval>
+
+  constructor(options: Options) {
+    this.commonData = options.commonData
+    this.pusher = options.pusher
+    if (this.pusher) {
+      this.timer = setInterval(() => this.invokePush(), this.pusher.interval)
+    }
+  }
 
   addClickTracker(clickTracker: ClickTracker): void {
     this.addClickOrView(clickTracker)
@@ -163,6 +184,24 @@ export class TrackerManager {
     return this.unEndDurationTrackerMap.size
   }
 
+  stop() {
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
+  }
+
+  private invokePush() {
+    const trackers = this.getTrackers()
+    if (trackers.length === 0) {
+      return
+    }
+    this.pusher.pushFn(trackers).catch((err) => {
+      console.log(
+        `invokePush tracers: ${JSON.stringify(trackers)}, error: ${err}`
+      )
+    })
+  }
+
   private refreshDurationTracker(tracker: DurationTracker) {
     if (tracker.type !== 'start') {
       throw new Error('only start duration tracker can be refresh')
@@ -193,6 +232,13 @@ export class TrackerManager {
     tracker.appendExt(this.commonData)
     tracker.appendExt({ prevScreen: this.prevScreen })
     this.trackersMap.set(tracker.eventId, tracker)
+    if (
+      this.pusher &&
+      this.pusher.sizeThreshold > 0 &&
+      this.trackersMap.size >= this.pusher.sizeThreshold
+    ) {
+      this.invokePush()
+    }
   }
 }
 

@@ -6,13 +6,17 @@ import {
 } from './index'
 
 const main = async () => {
-  const tm = new TrackerManager({ userId: 'xx' })
-
-  setInterval(() => {
-    console.log(JSON.stringify(tm.getTrackers()))
-    console.log('unend map size: ', tm.unEndDurationTrackerSize)
-    console.log('tracker size: ', tm.trackerSize)
-  }, 3000)
+  const tm = new TrackerManager({
+    commonData: { userId: 'xx' },
+    pusher: {
+      pushFn: async (tracers) => {
+        console.log(JSON.stringify(tracers))
+        console.log('unend map size: ', tm.unEndDurationTrackerSize)
+        console.log('tracker size: ', tm.trackerSize)
+      },
+      interval: 3000,
+    },
+  })
 
   const vt1 = createViewTracker({
     eventName: 'view',
