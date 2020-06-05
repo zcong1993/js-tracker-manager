@@ -20,6 +20,7 @@ export type DurationType = 'start' | 'end'
 export type ExtType = Record<string, any>
 
 export class Tracker {
+  trackerType: 'click' | 'view' | 'duration'
   eventId: string
   eventName: string
   ext: ExtType = {}
@@ -37,6 +38,7 @@ export class Tracker {
   toJSON() {
     const obj = {
       // eventId: this.eventId,
+      trackerType: this.trackerType,
       eventName: this.eventName,
       ext: this.ext,
       screenName: this.screenName,
@@ -65,8 +67,10 @@ export class DurationTracker extends Tracker {
     t.screenName = this.screenName
     t.prevScreen = this.prevScreen
     t.t = this.t
+    t.time = this.time
     t.duration = this.duration
     t.type = this.type
+    t.trackerType = this.trackerType
     return t
   }
 
@@ -142,7 +146,6 @@ export class TrackerManager {
     this.handleScreen(tracker)
 
     tracker.appendExt(this.commonData)
-    tracker.prevScreen = this.prevScreen
     this.unEndDurationTrackerMap.set(tracker.eventId, tracker)
   }
 
@@ -210,9 +213,11 @@ export class TrackerManager {
     const duration = nano2s(now - tracker.t)
     t.appendExt({ duration })
     t.duration = duration
+    t.endTime = new Date()
 
     // reset start tracker
     tracker.t = now
+    tracker.time = t.endTime
 
     return t
   }
@@ -221,7 +226,6 @@ export class TrackerManager {
     this.handleScreen(tracker)
 
     tracker.appendExt(this.commonData)
-    tracker.prevScreen = this.prevScreen
     this.trackersMap.set(tracker.eventId, tracker)
     if (
       this.pusher &&
@@ -241,6 +245,8 @@ export class TrackerManager {
     if (!tracker.screenName) {
       tracker.screenName = this.currScreen
     }
+
+    tracker.prevScreen = this.prevScreen
   }
 }
 
@@ -260,6 +266,7 @@ export interface IDurationTracker extends IViewClickTracker {
 
 export const createViewTracker = (opt: IViewClickTracker) => {
   const vt = new ViewTracker()
+  vt.trackerType = 'view'
   if (!opt.eventId) {
     opt.eventId = randomId()
   }
@@ -277,6 +284,7 @@ export const createViewTracker = (opt: IViewClickTracker) => {
 
 export const createClickTracker = (opt: IViewClickTracker) => {
   const vt = new ClickTracker()
+  vt.trackerType = 'click'
   if (!opt.eventId) {
     opt.eventId = randomId()
   }
@@ -294,6 +302,7 @@ export const createClickTracker = (opt: IViewClickTracker) => {
 
 export const createDurationTracker = (opt: IDurationTracker) => {
   const vt = new DurationTracker()
+  vt.trackerType = 'duration'
   vt.eventId = opt.eventId
   vt.eventName = opt.eventName
   vt.screenName = opt.screenName

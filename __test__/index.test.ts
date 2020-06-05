@@ -55,7 +55,12 @@ it('view tracker should work well', () => {
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
-    { eventName: 'view', ext: { userId: 'xx' }, screenName: 'presale' },
+    {
+      eventName: 'view',
+      ext: { userId: 'xx' },
+      screenName: 'presale',
+      trackerType: 'view',
+    },
   ])
   expect(tm.trackerSize).toBe(0)
 
@@ -72,6 +77,7 @@ it('view tracker should work well', () => {
       eventName: 'view',
       ext: { userId: 'xx' },
       screenName: 'presale',
+      trackerType: 'view',
     })
   )
   expect(tm.trackerSize).toBe(0)
@@ -92,6 +98,7 @@ it('view tracker should work well', () => {
       eventName: 'view',
       ext: { userId: 'xx' },
       screenName: 'presale',
+      trackerType: 'view',
     })
   )
   expect(tm.trackerSize).toBe(0)
@@ -114,12 +121,13 @@ it('click tracker should work well', () => {
       eventName: 'click',
       ext: { userId: 'xx', test: 1 },
       screenName: 'presale',
+      trackerType: 'click',
     },
   ])
   expect(tm.trackerSize).toBe(0)
 
   for (let i = 0; i < 10; i++) {
-    const vt1 = createViewTracker({
+    const vt1 = createClickTracker({
       eventName: 'click',
       screenName: 'presale',
     })
@@ -132,13 +140,14 @@ it('click tracker should work well', () => {
       eventName: 'click',
       ext: { userId: 'xx' },
       screenName: 'presale',
+      trackerType: 'click',
     })
   )
   expect(tm.trackerSize).toBe(0)
 
   // same eventId
   for (let i = 0; i < 10; i++) {
-    const vt1 = createViewTracker({
+    const vt1 = createClickTracker({
       eventId: 'xxx',
       eventName: 'click',
       screenName: 'presale',
@@ -152,6 +161,7 @@ it('click tracker should work well', () => {
       eventName: 'click',
       ext: { userId: 'xx' },
       screenName: 'presale',
+      trackerType: 'click',
     })
   )
   expect(tm.trackerSize).toBe(0)
@@ -190,6 +200,7 @@ it('duration tracker should work well', async () => {
       ext: { userId: 'xx', duration: 1, test: 1 },
       duration: 1,
       screenName: 'video',
+      trackerType: 'duration',
     },
   ])
 
@@ -218,6 +229,7 @@ it('split duration tracker should work well', async () => {
       ext: { userId: 'xx', duration: 1 },
       duration: 1,
       screenName: 'video',
+      trackerType: 'duration',
     },
   ])
 
@@ -237,6 +249,7 @@ it('split duration tracker should work well', async () => {
       ext: { userId: 'xx', duration: 1 },
       duration: 1,
       screenName: 'video',
+      trackerType: 'duration',
     },
   ])
 
@@ -312,6 +325,7 @@ it('screen should works well', async () => {
       ext: { userId: 'xx', test: 1 },
       screenName: 'presale',
       prevScreen: 'prev',
+      trackerType: 'view',
     },
   ])
 
@@ -326,6 +340,7 @@ it('screen should works well', async () => {
       ext: { userId: 'xx' },
       screenName: 'pay',
       prevScreen: 'presale',
+      trackerType: 'view',
     },
   ])
 })
