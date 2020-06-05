@@ -24,6 +24,7 @@ export class Tracker {
   eventName: string
   ext: ExtType = {}
   screenName?: string
+  prevScreen?: string
   time?: Date
 
   appendExt(added: ExtType) {
@@ -39,6 +40,7 @@ export class Tracker {
       eventName: this.eventName,
       ext: this.ext,
       screenName: this.screenName,
+      prevScreen: this.prevScreen,
       time: this.time,
     }
 
@@ -61,6 +63,7 @@ export class DurationTracker extends Tracker {
     t.eventName = this.eventName
     t.ext = this.ext
     t.screenName = this.screenName
+    t.prevScreen = this.prevScreen
     t.t = this.t
     t.duration = this.duration
     t.type = this.type
@@ -136,17 +139,10 @@ export class TrackerManager {
       return
     }
 
-    if (tracker.screenName && tracker.screenName !== this.currScreen) {
-      this.prevScreen = this.currScreen
-      this.currScreen = tracker.screenName
-    }
-
-    if (!tracker.screenName) {
-      tracker.screenName = this.currScreen
-    }
+    this.handleScreen(tracker)
 
     tracker.appendExt(this.commonData)
-    tracker.appendExt({ prevScreen: this.prevScreen })
+    tracker.prevScreen = this.prevScreen
     this.unEndDurationTrackerMap.set(tracker.eventId, tracker)
   }
 
@@ -196,6 +192,7 @@ export class TrackerManager {
       return
     }
     this.pusher.pushFn(trackers).catch((err) => {
+      /* istanbul ignore next */
       console.log(
         `invokePush tracers: ${JSON.stringify(trackers)}, error: ${err}`
       )
@@ -204,6 +201,7 @@ export class TrackerManager {
 
   private refreshDurationTracker(tracker: DurationTracker) {
     if (tracker.type !== 'start') {
+      /* istanbul ignore next */
       throw new Error('only start duration tracker can be refresh')
     }
 
@@ -220,17 +218,10 @@ export class TrackerManager {
   }
 
   private addClickOrView(tracker: ClickTracker | ViewTracker): void {
-    if (tracker.screenName && tracker.screenName !== this.currScreen) {
-      this.prevScreen = this.currScreen
-      this.currScreen = tracker.screenName
-    }
-
-    if (!tracker.screenName) {
-      tracker.screenName = this.currScreen
-    }
+    this.handleScreen(tracker)
 
     tracker.appendExt(this.commonData)
-    tracker.appendExt({ prevScreen: this.prevScreen })
+    tracker.prevScreen = this.prevScreen
     this.trackersMap.set(tracker.eventId, tracker)
     if (
       this.pusher &&
@@ -238,6 +229,17 @@ export class TrackerManager {
       this.trackersMap.size >= this.pusher.sizeThreshold
     ) {
       this.invokePush()
+    }
+  }
+
+  private handleScreen(tracker: Tracker) {
+    if (tracker.screenName && tracker.screenName !== this.currScreen) {
+      this.prevScreen = this.currScreen || this.prevScreen
+      this.currScreen = tracker.screenName
+    }
+
+    if (!tracker.screenName) {
+      tracker.screenName = this.currScreen
     }
   }
 }

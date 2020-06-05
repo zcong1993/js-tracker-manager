@@ -103,13 +103,18 @@ it('click tracker should work well', () => {
   const vt1 = createClickTracker({
     eventName: 'click',
     screenName: 'presale',
+    ext: { test: 1 },
   })
   tm.addClickTracker(vt1)
 
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
-    { eventName: 'click', ext: { userId: 'xx' }, screenName: 'presale' },
+    {
+      eventName: 'click',
+      ext: { userId: 'xx', test: 1 },
+      screenName: 'presale',
+    },
   ])
   expect(tm.trackerSize).toBe(0)
 
@@ -161,6 +166,7 @@ it('duration tracker should work well', async () => {
     eventName: 'playVideo',
     // screenName: 'video',
     t: 1209756949197785,
+    ext: { test: 1 },
   })
   tm.addDurationTracker(start)
 
@@ -181,7 +187,7 @@ it('duration tracker should work well', async () => {
   expectDurationArray(omit(toData(tm.getTrackers()), 'time', 'endTime'), [
     {
       eventName: 'playVideo',
-      ext: { userId: 'xx', duration: 1 },
+      ext: { userId: 'xx', duration: 1, test: 1 },
       duration: 1,
       screenName: 'video',
     },
@@ -288,4 +294,38 @@ it('pusher should works well', async () => {
   await sleep(200)
   expect(mockPusher2).toBeCalledTimes(4)
   expect(mockPusher2.mock.calls[3][0].length).toBe(1)
+})
+
+it('screen should works well', async () => {
+  const tm = new TrackerManager({ commonData: { userId: 'xx' } })
+  tm.setPrevScreen('prev')
+  const vt1 = createViewTracker({
+    eventName: 'view',
+    screenName: 'presale',
+    ext: { test: 1 },
+  })
+  tm.addViewTracker(vt1)
+
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
+    {
+      eventName: 'view',
+      ext: { userId: 'xx', test: 1 },
+      screenName: 'presale',
+      prevScreen: 'prev',
+    },
+  ])
+
+  const vt2 = createViewTracker({
+    eventName: 'view',
+    screenName: 'pay',
+  })
+  tm.addViewTracker(vt2)
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
+    {
+      eventName: 'view',
+      ext: { userId: 'xx' },
+      screenName: 'pay',
+      prevScreen: 'presale',
+    },
+  ])
 })
