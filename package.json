@@ -1,6 +1,6 @@
 {
   "name": "@zcong/js-tracker-manager",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "my cool project",
   "main": "./dist/index.js",
   "files": [
