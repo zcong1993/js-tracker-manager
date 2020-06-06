@@ -149,12 +149,18 @@ export class TrackerManager {
     this.unEndDurationTrackerMap.set(tracker.eventId, tracker)
   }
 
-  endDurationTracker(eventId: string) {
-    const endEvent = new DurationTracker()
-    endEvent.eventId = eventId
-    endEvent.type = 'end'
+  endDurationTracker(...eventIds: string[]) {
+    for (const eventId of eventIds) {
+      const endEvent = new DurationTracker()
+      endEvent.eventId = eventId
+      endEvent.type = 'end'
 
-    this.addDurationTracker(endEvent)
+      this.addDurationTracker(endEvent)
+    }
+  }
+
+  endAllDurationTrackers() {
+    this.endDurationTracker(...this.unEndDurationTrackerMap.keys())
   }
 
   getTrackers() {
@@ -172,6 +178,9 @@ export class TrackerManager {
   }
 
   setCurrentScreen(currScreen: string) {
+    if (this.currScreen) {
+      this.prevScreen = this.currScreen
+    }
     this.currScreen = currScreen
   }
 

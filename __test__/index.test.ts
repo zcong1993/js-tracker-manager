@@ -208,6 +208,36 @@ it('duration tracker should work well', async () => {
   expect(tm.unEndDurationTrackerSize).toBe(0)
 })
 
+it('duration tracker endAll should work well', async () => {
+  const tm = new TrackerManager({ commonData: { userId: 'xx' } })
+  tm.setCurrentScreen('video')
+  const start = createDurationTracker({
+    type: 'start',
+    eventId: 'd-1',
+    eventName: 'playVideo',
+    t: 1209756949197785,
+    ext: { test: 1 },
+  })
+  tm.addDurationTracker(start)
+
+  const start2 = createDurationTracker({
+    type: 'start',
+    eventId: 'd-2',
+    eventName: 'playVideo',
+    t: 1209756949197785,
+    ext: { test: 2 },
+  })
+  tm.addDurationTracker(start2)
+
+  expect(tm.trackerSize).toBe(0)
+  expect(tm.unEndDurationTrackerSize).toBe(2)
+
+  tm.endAllDurationTrackers()
+
+  expect(tm.trackerSize).toBe(2)
+  expect(tm.unEndDurationTrackerSize).toBe(0)
+})
+
 it('split duration tracker should work well', async () => {
   const tm = new TrackerManager({ commonData: { userId: 'xx' } })
   const start = createDurationTracker({
@@ -338,6 +368,42 @@ it('screen should works well', async () => {
     {
       eventName: 'view',
       ext: { userId: 'xx' },
+      screenName: 'pay',
+      prevScreen: 'presale',
+      trackerType: 'view',
+    },
+  ])
+})
+
+it('enter new page should works well', async () => {
+  const tm = new TrackerManager({ commonData: { userId: 'xx' } })
+  tm.setCurrentScreen('presale')
+  const vt1 = createViewTracker({
+    eventName: 'view',
+    ext: { test: 1 },
+  })
+  tm.addViewTracker(vt1)
+
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
+    {
+      eventName: 'view',
+      ext: { userId: 'xx', test: 1 },
+      screenName: 'presale',
+      trackerType: 'view',
+    },
+  ])
+
+  tm.setCurrentScreen('pay')
+  const vt2 = createViewTracker({
+    eventName: 'view',
+    ext: { test: 1 },
+  })
+  tm.addViewTracker(vt2)
+
+  expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
+    {
+      eventName: 'view',
+      ext: { userId: 'xx', test: 1 },
       screenName: 'pay',
       prevScreen: 'presale',
       trackerType: 'view',
