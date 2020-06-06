@@ -37,7 +37,7 @@ export class Tracker {
 
   toJSON() {
     const obj = {
-      // eventId: this.eventId,
+      eventId: this.eventId,
       trackerType: this.trackerType,
       eventName: this.eventName,
       ext: this.ext,
@@ -311,6 +311,10 @@ export const createClickTracker = (opt: IViewClickTracker) => {
 
 export const createDurationTracker = (opt: IDurationTracker) => {
   const vt = new DurationTracker()
+  /* istanbul ignore next */
+  if (!opt.eventId || !opt.type) {
+    throw new Error('opt.eventId and opt.type are required')
+  }
   vt.trackerType = 'duration'
   vt.eventId = opt.eventId
   vt.eventName = opt.eventName

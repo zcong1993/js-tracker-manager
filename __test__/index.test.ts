@@ -47,6 +47,7 @@ it('view tracker should work well', () => {
   const tm = new TrackerManager({ commonData: { userId: 'xx' } })
 
   const vt1 = createViewTracker({
+    eventId: 'a',
     eventName: 'view',
     screenName: 'presale',
   })
@@ -56,6 +57,7 @@ it('view tracker should work well', () => {
   expect(tm.unEndDurationTrackerSize).toBe(0)
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
+      eventId: 'a',
       eventName: 'view',
       ext: { userId: 'xx' },
       screenName: 'presale',
@@ -72,7 +74,7 @@ it('view tracker should work well', () => {
   }
   expect(tm.trackerSize).toBe(10)
   expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
+  expect(omit(toData(tm.getTrackers()), 'time', 'eventId')).toEqual(
     Array(10).fill({
       eventName: 'view',
       ext: { userId: 'xx' },
@@ -95,6 +97,7 @@ it('view tracker should work well', () => {
   expect(tm.unEndDurationTrackerSize).toBe(0)
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
     Array(1).fill({
+      eventId: 'xxx',
       eventName: 'view',
       ext: { userId: 'xx' },
       screenName: 'presale',
@@ -108,6 +111,7 @@ it('click tracker should work well', () => {
   const tm = new TrackerManager({ commonData: { userId: 'xx' } })
 
   const vt1 = createClickTracker({
+    eventId: 'a',
     eventName: 'click',
     screenName: 'presale',
     ext: { test: 1 },
@@ -118,6 +122,7 @@ it('click tracker should work well', () => {
   expect(tm.unEndDurationTrackerSize).toBe(0)
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
+      eventId: 'a',
       eventName: 'click',
       ext: { userId: 'xx', test: 1 },
       screenName: 'presale',
@@ -135,7 +140,7 @@ it('click tracker should work well', () => {
   }
   expect(tm.trackerSize).toBe(10)
   expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
+  expect(omit(toData(tm.getTrackers()), 'time', 'eventId')).toEqual(
     Array(10).fill({
       eventName: 'click',
       ext: { userId: 'xx' },
@@ -158,6 +163,7 @@ it('click tracker should work well', () => {
   expect(tm.unEndDurationTrackerSize).toBe(0)
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
     Array(1).fill({
+      eventId: 'xxx',
       eventName: 'click',
       ext: { userId: 'xx' },
       screenName: 'presale',
@@ -196,6 +202,7 @@ it('duration tracker should work well', async () => {
 
   expectDurationArray(omit(toData(tm.getTrackers()), 'time', 'endTime'), [
     {
+      eventId: 'd-1',
       eventName: 'playVideo',
       ext: { userId: 'xx', duration: 1, test: 1 },
       duration: 1,
@@ -255,6 +262,7 @@ it('split duration tracker should work well', async () => {
 
   expectDurationArray(omit(toData(tm.getTrackers()), 'time', 'endTime'), [
     {
+      eventId: 'd-1',
       eventName: 'playVideo',
       ext: { userId: 'xx', duration: 1 },
       duration: 1,
@@ -275,6 +283,7 @@ it('split duration tracker should work well', async () => {
 
   expectDurationArray(omit(toData(tm.getTrackers()), 'time', 'endTime'), [
     {
+      eventId: 'd-1',
       eventName: 'playVideo',
       ext: { userId: 'xx', duration: 1 },
       duration: 1,
@@ -343,6 +352,7 @@ it('screen should works well', async () => {
   const tm = new TrackerManager({ commonData: { userId: 'xx' } })
   tm.setPrevScreen('prev')
   const vt1 = createViewTracker({
+    eventId: 'a',
     eventName: 'view',
     screenName: 'presale',
     ext: { test: 1 },
@@ -351,6 +361,7 @@ it('screen should works well', async () => {
 
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
+      eventId: 'a',
       eventName: 'view',
       ext: { userId: 'xx', test: 1 },
       screenName: 'presale',
@@ -360,12 +371,14 @@ it('screen should works well', async () => {
   ])
 
   const vt2 = createViewTracker({
+    eventId: 'b',
     eventName: 'view',
     screenName: 'pay',
   })
   tm.addViewTracker(vt2)
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
+      eventId: 'b',
       eventName: 'view',
       ext: { userId: 'xx' },
       screenName: 'pay',
@@ -379,6 +392,7 @@ it('enter new page should works well', async () => {
   const tm = new TrackerManager({ commonData: { userId: 'xx' } })
   tm.setCurrentScreen('presale')
   const vt1 = createViewTracker({
+    eventId: 'a',
     eventName: 'view',
     ext: { test: 1 },
   })
@@ -386,6 +400,7 @@ it('enter new page should works well', async () => {
 
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
+      eventId: 'a',
       eventName: 'view',
       ext: { userId: 'xx', test: 1 },
       screenName: 'presale',
@@ -395,6 +410,7 @@ it('enter new page should works well', async () => {
 
   tm.setCurrentScreen('pay')
   const vt2 = createViewTracker({
+    eventId: 'b',
     eventName: 'view',
     ext: { test: 1 },
   })
@@ -402,6 +418,7 @@ it('enter new page should works well', async () => {
 
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
+      eventId: 'b',
       eventName: 'view',
       ext: { userId: 'xx', test: 1 },
       screenName: 'pay',
