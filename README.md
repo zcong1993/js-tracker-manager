@@ -65,6 +65,12 @@ const main = async () => {
 main()
 ```
 
+## Example
+
+demo repo [zcong1993/js-tracker-manager-vue](https://github.com/zcong1993/js-tracker-manager-vue)
+
+preview url [https://js-tracker-manager-vue-deg5g28nr.now.sh](https://js-tracker-manager-vue-deg5g28nr.now.sh)
+
 ## License
 
 MIT &copy; zcong1993
