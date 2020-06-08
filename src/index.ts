@@ -20,7 +20,7 @@ export type DurationType = 'start' | 'end'
 export type ExtType = Record<string, any>
 
 export class Tracker {
-  trackerType: 'click' | 'view' | 'duration'
+  trackerType: 'event' | 'duration'
   eventId: string
   eventName: string
   ext: ExtType = {}
@@ -50,8 +50,7 @@ export class Tracker {
   }
 }
 
-export class ClickTracker extends Tracker {}
-export class ViewTracker extends Tracker {}
+export class EventTracker extends Tracker {}
 
 export class DurationTracker extends Tracker {
   t?: number
@@ -113,12 +112,18 @@ export class TrackerManager {
     }
   }
 
-  addClickTracker(clickTracker: ClickTracker): void {
-    this.addClickOrView(clickTracker)
-  }
+  addEventTracker(tracker: EventTracker): void {
+    this.handleScreen(tracker)
 
-  addViewTracker(viewTracker: ViewTracker): void {
-    this.addClickOrView(viewTracker)
+    tracker.appendExt(this.commonData)
+    this.trackersMap.set(tracker.eventId, tracker)
+    if (
+      this.pusher &&
+      this.pusher.sizeThreshold > 0 &&
+      this.trackersMap.size >= this.pusher.sizeThreshold
+    ) {
+      this.invokePush()
+    }
   }
 
   addDurationTracker(tracker: DurationTracker): void {
@@ -231,20 +236,6 @@ export class TrackerManager {
     return t
   }
 
-  private addClickOrView(tracker: ClickTracker | ViewTracker): void {
-    this.handleScreen(tracker)
-
-    tracker.appendExt(this.commonData)
-    this.trackersMap.set(tracker.eventId, tracker)
-    if (
-      this.pusher &&
-      this.pusher.sizeThreshold > 0 &&
-      this.trackersMap.size >= this.pusher.sizeThreshold
-    ) {
-      this.invokePush()
-    }
-  }
-
   private handleScreen(tracker: Tracker) {
     if (tracker.screenName && tracker.screenName !== this.currScreen) {
       this.prevScreen = this.currScreen || this.prevScreen
@@ -259,7 +250,7 @@ export class TrackerManager {
   }
 }
 
-export interface IViewClickTracker {
+export interface IEventTracker {
   eventName: string
   eventId?: string
   ext?: ExtType
@@ -267,33 +258,15 @@ export interface IViewClickTracker {
   time?: Date
 }
 
-export interface IDurationTracker extends IViewClickTracker {
+export interface IDurationTracker extends IEventTracker {
   t?: number
   type: DurationType
   eventId: string
 }
 
-export const createViewTracker = (opt: IViewClickTracker) => {
-  const vt = new ViewTracker()
-  vt.trackerType = 'view'
-  if (!opt.eventId) {
-    opt.eventId = randomId()
-  }
-  vt.eventId = opt.eventId
-  vt.eventName = opt.eventName
-  vt.screenName = opt.screenName
-  if (opt.ext) {
-    vt.ext = opt.ext
-  }
-
-  vt.time = new Date()
-
-  return vt
-}
-
-export const createClickTracker = (opt: IViewClickTracker) => {
-  const vt = new ClickTracker()
-  vt.trackerType = 'click'
+export const createEventTracker = (opt: IEventTracker) => {
+  const vt = new EventTracker()
+  vt.trackerType = 'event'
   if (!opt.eventId) {
     opt.eventId = randomId()
   }

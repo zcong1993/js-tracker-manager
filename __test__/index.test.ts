@@ -1,7 +1,6 @@
 import {
   TrackerManager,
-  createViewTracker,
-  createClickTracker,
+  createEventTracker,
   createDurationTracker,
 } from '../src'
 
@@ -43,15 +42,15 @@ const expectDurationArray = (
 
 const sleep = (n: number) => new Promise((r) => setTimeout(r, n))
 
-it('view tracker should work well', () => {
+it('event tracker should work well', () => {
   const tm = new TrackerManager({ commonData: { userId: 'xx' } })
 
-  const vt1 = createViewTracker({
+  const vt1 = createEventTracker({
     eventId: 'a',
     eventName: 'view',
     screenName: 'presale',
   })
-  tm.addViewTracker(vt1)
+  tm.addEventTracker(vt1)
 
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
@@ -61,16 +60,16 @@ it('view tracker should work well', () => {
       eventName: 'view',
       ext: { userId: 'xx' },
       screenName: 'presale',
-      trackerType: 'view',
+      trackerType: 'event',
     },
   ])
   expect(tm.trackerSize).toBe(0)
 
   for (let i = 0; i < 10; i++) {
-    const vt1 = createViewTracker({
+    const vt1 = createEventTracker({
       eventName: 'view',
     })
-    tm.addViewTracker(vt1)
+    tm.addEventTracker(vt1)
   }
   expect(tm.trackerSize).toBe(10)
   expect(tm.unEndDurationTrackerSize).toBe(0)
@@ -79,19 +78,19 @@ it('view tracker should work well', () => {
       eventName: 'view',
       ext: { userId: 'xx' },
       screenName: 'presale',
-      trackerType: 'view',
+      trackerType: 'event',
     })
   )
   expect(tm.trackerSize).toBe(0)
 
   // same eventId
   for (let i = 0; i < 10; i++) {
-    const vt1 = createViewTracker({
+    const vt1 = createEventTracker({
       eventId: 'xxx',
       eventName: 'view',
       screenName: 'presale',
     })
-    tm.addViewTracker(vt1)
+    tm.addEventTracker(vt1)
   }
   expect(tm.trackerSize).toBe(1)
   expect(tm.unEndDurationTrackerSize).toBe(0)
@@ -101,73 +100,7 @@ it('view tracker should work well', () => {
       eventName: 'view',
       ext: { userId: 'xx' },
       screenName: 'presale',
-      trackerType: 'view',
-    })
-  )
-  expect(tm.trackerSize).toBe(0)
-})
-
-it('click tracker should work well', () => {
-  const tm = new TrackerManager({ commonData: { userId: 'xx' } })
-
-  const vt1 = createClickTracker({
-    eventId: 'a',
-    eventName: 'click',
-    screenName: 'presale',
-    ext: { test: 1 },
-  })
-  tm.addClickTracker(vt1)
-
-  expect(tm.trackerSize).toBe(1)
-  expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
-    {
-      eventId: 'a',
-      eventName: 'click',
-      ext: { userId: 'xx', test: 1 },
-      screenName: 'presale',
-      trackerType: 'click',
-    },
-  ])
-  expect(tm.trackerSize).toBe(0)
-
-  for (let i = 0; i < 10; i++) {
-    const vt1 = createClickTracker({
-      eventName: 'click',
-      screenName: 'presale',
-    })
-    tm.addClickTracker(vt1)
-  }
-  expect(tm.trackerSize).toBe(10)
-  expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(omit(toData(tm.getTrackers()), 'time', 'eventId')).toEqual(
-    Array(10).fill({
-      eventName: 'click',
-      ext: { userId: 'xx' },
-      screenName: 'presale',
-      trackerType: 'click',
-    })
-  )
-  expect(tm.trackerSize).toBe(0)
-
-  // same eventId
-  for (let i = 0; i < 10; i++) {
-    const vt1 = createClickTracker({
-      eventId: 'xxx',
-      eventName: 'click',
-      screenName: 'presale',
-    })
-    tm.addClickTracker(vt1)
-  }
-  expect(tm.trackerSize).toBe(1)
-  expect(tm.unEndDurationTrackerSize).toBe(0)
-  expect(omit(toData(tm.getTrackers()), 'time')).toEqual(
-    Array(1).fill({
-      eventId: 'xxx',
-      eventName: 'click',
-      ext: { userId: 'xx' },
-      screenName: 'presale',
-      trackerType: 'click',
+      trackerType: 'event',
     })
   )
   expect(tm.trackerSize).toBe(0)
@@ -308,11 +241,11 @@ it('pusher should works well', async () => {
   })
 
   for (let i = 0; i < 10; i++) {
-    const vt1 = createViewTracker({
+    const vt1 = createEventTracker({
       eventName: 'view',
       screenName: 'presale',
     })
-    tm.addViewTracker(vt1)
+    tm.addEventTracker(vt1)
   }
 
   await sleep(100)
@@ -332,11 +265,11 @@ it('pusher should works well', async () => {
   })
 
   for (let i = 0; i < 10; i++) {
-    const vt1 = createViewTracker({
+    const vt1 = createEventTracker({
       eventName: 'view',
       screenName: 'presale',
     })
-    tm2.addViewTracker(vt1)
+    tm2.addEventTracker(vt1)
   }
 
   expect(mockPusher2).toBeCalledTimes(3)
@@ -351,13 +284,13 @@ it('pusher should works well', async () => {
 it('screen should works well', async () => {
   const tm = new TrackerManager({ commonData: { userId: 'xx' } })
   tm.setPrevScreen('prev')
-  const vt1 = createViewTracker({
+  const vt1 = createEventTracker({
     eventId: 'a',
     eventName: 'view',
     screenName: 'presale',
     ext: { test: 1 },
   })
-  tm.addViewTracker(vt1)
+  tm.addEventTracker(vt1)
 
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
@@ -366,16 +299,16 @@ it('screen should works well', async () => {
       ext: { userId: 'xx', test: 1 },
       screenName: 'presale',
       prevScreen: 'prev',
-      trackerType: 'view',
+      trackerType: 'event',
     },
   ])
 
-  const vt2 = createViewTracker({
+  const vt2 = createEventTracker({
     eventId: 'b',
     eventName: 'view',
     screenName: 'pay',
   })
-  tm.addViewTracker(vt2)
+  tm.addEventTracker(vt2)
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
       eventId: 'b',
@@ -383,7 +316,7 @@ it('screen should works well', async () => {
       ext: { userId: 'xx' },
       screenName: 'pay',
       prevScreen: 'presale',
-      trackerType: 'view',
+      trackerType: 'event',
     },
   ])
 })
@@ -391,12 +324,12 @@ it('screen should works well', async () => {
 it('enter new page should works well', async () => {
   const tm = new TrackerManager({ commonData: { userId: 'xx' } })
   tm.setCurrentScreen('presale')
-  const vt1 = createViewTracker({
+  const vt1 = createEventTracker({
     eventId: 'a',
     eventName: 'view',
     ext: { test: 1 },
   })
-  tm.addViewTracker(vt1)
+  tm.addEventTracker(vt1)
 
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
@@ -404,17 +337,17 @@ it('enter new page should works well', async () => {
       eventName: 'view',
       ext: { userId: 'xx', test: 1 },
       screenName: 'presale',
-      trackerType: 'view',
+      trackerType: 'event',
     },
   ])
 
   tm.setCurrentScreen('pay')
-  const vt2 = createViewTracker({
+  const vt2 = createEventTracker({
     eventId: 'b',
     eventName: 'view',
     ext: { test: 1 },
   })
-  tm.addViewTracker(vt2)
+  tm.addEventTracker(vt2)
 
   expect(omit(toData(tm.getTrackers()), 'time')).toEqual([
     {
@@ -423,7 +356,7 @@ it('enter new page should works well', async () => {
       ext: { userId: 'xx', test: 1 },
       screenName: 'pay',
       prevScreen: 'presale',
-      trackerType: 'view',
+      trackerType: 'event',
     },
   ])
 })

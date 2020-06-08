@@ -1,8 +1,7 @@
 import {
   TrackerManager,
-  createClickTracker,
   createDurationTracker,
-  createViewTracker,
+  createEventTracker,
 } from './index'
 
 const main = async () => {
@@ -18,11 +17,11 @@ const main = async () => {
     },
   })
 
-  const vt1 = createViewTracker({
+  const vt1 = createEventTracker({
     eventName: 'view',
     screenName: 'presale',
   })
-  tm.addViewTracker(vt1)
+  tm.addEventTracker(vt1)
 
   const d1 = createDurationTracker({
     type: 'start',
@@ -37,12 +36,12 @@ const main = async () => {
     tm.endDurationTracker('video-2')
   }, 5000)
 
-  const ct = createClickTracker({
+  const ct = createEventTracker({
     eventName: 'pay',
     screenName: 'payment',
   })
 
-  tm.addClickTracker(ct)
+  tm.addEventTracker(ct)
 }
 
 main()
