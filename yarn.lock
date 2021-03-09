@@ -661,6 +661,14 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
+"@rollup/pluginutils@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-4.1.0.tgz#0dcc61c780e39257554feb7f77207dceca13c838"
+  integrity sha512-TrBhfJkFxA+ER+ew2U2/fHbebhLT/l/2pRk0hfj9KusXUuRXd2v0R58AfaZK9VXDQ4TogOSEmICVrQAA3zFnHQ==
+  dependencies:
+    estree-walker "^2.0.1"
+    picomatch "^2.2.2"
+
 "@sinonjs/commons@^1.7.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.8.0.tgz#c8d68821a854c555bba172f3b06959a0039b236d"
@@ -5120,12 +5128,12 @@ rollup-plugin-dts@^3.0.0:
   optionalDependencies:
     "@babel/code-frame" "^7.12.13"
 
-rollup-plugin-esbuild@^2.4.2:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-esbuild/-/rollup-plugin-esbuild-2.4.2.tgz#631f272a06d349b5d7719ed20bae4fedd3ba756f"
-  integrity sha512-GJOaC2onOPcCN0w7tYv60Thg3ciX40YRubeGyS/DRo862udAiFuQGTIBSyNX20EWyvYLZmZ967ziGdzUJtIaAg==
+rollup-plugin-esbuild@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-esbuild/-/rollup-plugin-esbuild-3.0.0.tgz#271d0a5bae8c12a3a74ec1797884030517f5cc05"
+  integrity sha512-Yeg74feF0LL6VSbSgMjP1Fob4LIHQp2h3SFi2RkRBqKr8oavIuBiDpSTcydSENwdrkQb7Er9jppSYQl8mSqC7A==
   dependencies:
-    "@rollup/pluginutils" "^3.1.0"
+    "@rollup/pluginutils" "^4.1.0"
     joycon "^2.2.5"
     strip-json-comments "^3.1.1"
 
